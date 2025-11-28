@@ -1,77 +1,78 @@
-Autonomous Vehicle Obstacle Avoidance Simulation
+# Autonomous Vehicle Simulation: Micro-Grid & Macro-City Navigation
 
-A Python-based visual simulation that demonstrates how an Autonomous Vehicle (AV) detects obstacles, avoids collisions, and navigates through a road environment using a simple decision-making algorithm. The project visualizes the AV’s real-time environment, occupancy matrix, and path planning logic through multiple graphical panels.
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Pygame](https://img.shields.io/badge/Library-Pygame-green)
+![OSMnx](https://img.shields.io/badge/Geospatial-OSMnx-orange)
+![NetworkX](https://img.shields.io/badge/Graph-NetworkX-red)
 
- Overview
+## 🚗 Project Overview
 
-This simulation represents the functioning of an autonomous vehicle navigating on a grid-based road with multiple obstacles and potholes. The AV makes intelligent decisions at each time step to move safely while avoiding dynamic and static hazards.
+This project is a dual-layer autonomous vehicle (AV) simulation engine that bridges the gap between local safety and global navigation. Unlike standard simulations that focus on only one aspect, this system integrates two distinct planners:
 
-The interface contains:
+1.  **Global Planner (Macro-Scope):** Navigates real-world city networks (e.g., Jaipur, London) using OpenStreetMap data and a Modified Dijkstra Algorithm that accounts for real-time traffic density.
+2.  **Local Planner (Micro-Scope):** Handles immediate physical safety on an $8 \times 30$ grid, utilizing predictive collision detection to avoid dynamic obstacle vehicles and static potholes.
 
-Main Road View: Displays the AV, other moving vehicles, and potholes on a scrolling road.
+The simulation features a robust GUI with dual-view dashboards, real-time telemetry, occupancy matrices, and schematic overviews to visualize the AV's decision-making logic.
 
-Schematic Overview: Simplified top-down grid showing all object positions.
+## ✨ Key Features
 
-Occupancy Matrix: Binary matrix showing which grid cells are occupied.
+### 🌍 Module 1: Global Path Planning (Macro)
+* **Real-World Maps:** Uses `OSMnx` to fetch and render actual street networks from cities like **Jaipur, London, and New York**.
+* **Traffic-Aware Routing:** Implements a **Modified Dijkstra Algorithm** that calculates costs based on travel time and traffic density rather than just physical distance.
+    * *Formula:* $Cost = Length \times (1 + TrafficDensity^2 \times 0.1)$
+* **Dynamic Re-routing:** The AV automatically recalculates the optimal path if a user manually blocks a road or traffic congestion spikes.
+* **Abstract Graph Generation:** Converts complex geospatial data into simplified "Abstract Nodes" for easier waypoint selection.
 
-Path Planning Panel: Highlights how the AV plans its next move.
+### ⚠️ Module 2: Local Collision Avoidance (Micro)
+* **Predictive Safety:** Uses a `will_be_free()` function to check future grid states before moving.
+* **Dynamic Obstacles:** AI-driven obstacle vehicles move laterally, reverse at boundaries, and interact with the environment.
+* **Static Hazards:** Randomly generated potholes that require immediate avoidance maneuvering.
+* **Occupancy Matrix:** A real-time binary visualization of the grid ($8 \times 30$) used for debugging collision logic.
 
-Log Panel: Displays simulation events and debug information.
+### 📊 Visualization & Telemetry
+* **Schematic Overview:** Top-down logic view of the grid.
+* **Path Planning Panel:** Visualizes the A* or local search logic.
+* **Data Dashboard:** Plots success rates, collision counts, and completion times using `Matplotlib`.
 
- Features
+## 🛠️ Tech Stack
 
- Real-time vehicle motion and obstacle movement
- Random obstacle and pothole generation each run
- AV path planning with collision avoidance
- Multi-panel visualization (Schematic, Matrix, Planning View)
- Smooth animation using easing functions
- Dynamic environment with parallax road background
- Logging of simulation events for debugging
+* **Language:** Python 3.x
+* **Rendering Engine:** Pygame (60 FPS simulation loop)
+* **Geospatial Data:** OSMnx (OpenStreetMap API)
+* **Graph Algorithms:** NetworkX
+* **UI/UX:** Pygame-Menu
+* **Data Analysis:** Matplotlib, Pandas
 
- Algorithm and Logic
+## ⚙️ Algorithms Explained
 
-The Autonomous Vehicle (AV) follows a simple but effective path-planning logic:
+### 1. Modified Dijkstra (Global)
+Standard GPS navigation often fails to account for dynamic traffic flow. Our implementation weights the edges of the city graph dynamically. "Traffic Bots" move randomly through the city; their density on a specific road segment exponentially increases the "cost" of that edge, forcing the AV to find alternative, less congested routes.
 
-Obstacle Mapping:
-The AV reads the grid (occupancy matrix) to detect vehicles and potholes nearby.
+### 2. Predictive Collision Detection (Local)
+The local planner does not just check if a cell is empty *now*; it checks if it will be empty *in the next frame*.
+* **Pre-Move Check:** Validates if the target cell is within bounds and free of potholes.
+* **Dynamic Prediction:** specific logic ensures the AV does not move into a cell that an obstacle vehicle is about to enter.
+* **Terminal Check:** A final safety validation post-movement to trigger "Crash" states if physical overlap occurs.
 
-Movement Decision:
+## 🚀 Installation & Usage
 
-Move forward if the next cell is free.
+### Prerequisites
+Ensure you have Python 3.9+ installed.
 
-If blocked, check left/right lanes for a safe move.
+### Installation
+1.  Clone the repository:
+    ```bash
+    git clone [https://github.com/yourusername/av-simulation-project.git](https://github.com/yourusername/av-simulation-project.git)
+    cd av-simulation-project
+    ```
 
-If both sides are blocked, try diagonal escape.
+2.  Install dependencies:
+    ```bash
+    pip install pygame pygame-menu osmnx networkx matplotlib requests
+    ```
+    *(Note: Windows users may need to install binary wheels for `GDAL` or `Rtree` if OSMnx installation fails directly.)*
 
-If all directions are unsafe, stay put.
-
-Obstacle Dynamics:
-Each obstacle vehicle moves horizontally (left/right). If it reaches the edge or another vehicle, it reverses direction.
-
-Collision Avoidance:
-The AV ensures that no planned move results in occupying a cell with an obstacle or pothole.
-
-Animation Smoothing:
-The transition between cells uses an ease-in-out function for realistic motion.
-
- Real-World Inspiration
-
-This simulation mimics real-world AV systems such as those used by:
-
-Tesla Autopilot
-
-Waymo
-
-Cruise by GM
-
-Baidu Apollo
-
-These vehicles use real-time perception, obstacle detection, and motion planning algorithms to navigate safely — the core principles of which are represented here in a simplified grid format.
-
- Tech Stack
-Component	Technology
-Language	Python 3.x
-Graphics Engine	Pygame
-Data Structures	Dictionaries, Sets, Tuples
-Animation Logic	Frame-based easing interpolation
-UI Elements	Multi-panel rendering and logging
+### Running the Simulation
+Execute the main engine:
+```bash
+python main.py
