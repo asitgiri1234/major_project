@@ -76,3 +76,8 @@ Ensure you have Python 3.9+ installed.
 Execute the main engine:
 ```bash
 python main.py
+
+👥 Authors
+Tirumala Sumith (2021BTECH114)
+
+Asit Kumar Giri (2021BTECH028) 
